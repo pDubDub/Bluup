@@ -13,7 +13,12 @@ class GameScene: SKScene {
     
     private var label : SKLabelNode?
     private var spinnyNode : SKShapeNode?
-    
+
+    let sub = SKSpriteNode(imageNamed: "yellowSub400")
+
+    var backgroundBrightness: CGFloat = 0.5
+    var backgroundHue: CGFloat = 0.5
+
     override func didMove(to view: SKView) {
         
         // Get label node from scene and store it for use later
@@ -22,6 +27,7 @@ class GameScene: SKScene {
             label.alpha = 0.0
             label.run(SKAction.fadeIn(withDuration: 2.0))
         }
+        label?.zPosition = 5
         
         // Create shape node to use during mouse interaction
         let w = (self.size.width + self.size.height) * 0.05
@@ -35,14 +41,42 @@ class GameScene: SKScene {
                                               SKAction.fadeOut(withDuration: 0.5),
                                               SKAction.removeFromParent()]))
         }
+
+        self.backgroundColor = UIColor(hue: backgroundHue, saturation: 0.5, brightness: backgroundBrightness, alpha: 1.0)
+            // this works to set background color of scene.
+            // TODO - next would be to use touches to see if we can change it by touch.
+            // Note, in this model, we would need to overlap any surface waves on top of the scene, as opposed to previous thought of adjusting the top
+            //    edge of water. Don't think I can move the top edge of scene.
+
+        sub.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+//        sub.position = CGPoint(x: self.size.width,
+//                               y: self.size.height)
+        sub.position = CGPoint(x: self.size.width/4, y: self.size.height/2 + sub.size.height/2)
+        // Something about the template GameScene sets the origin of the scene 0,0 at the center of the screen.
+//        print("Screen width is \(self.size.width) by \(self.size.height)")
+
+        sub.setScale(0.5)
+        sub.zPosition = 1
+        sub.zRotation = 0.25
+        addChild(sub)
     }
-    
+
+    override func update(_ currentTime: TimeInterval) {
+        // Called before each frame is rendered
+
+        backgroundBrightness -= 0.00025
+        backgroundHue += 0.00015
+        self.backgroundColor = UIColor(hue: backgroundHue, saturation: 0.5, brightness: backgroundBrightness, alpha: 1.0)
+        sub.position.x -= 0.3
+        sub.position.y -= 1
+    }
     
     func touchDown(atPoint pos : CGPoint) {
         if let n = self.spinnyNode?.copy() as! SKShapeNode? {
             n.position = pos
             n.strokeColor = SKColor.green
             self.addChild(n)
+//            print(n.position.x)
         }
     }
     
@@ -83,7 +117,5 @@ class GameScene: SKScene {
     }
     
     
-    override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
-    }
+
 }
